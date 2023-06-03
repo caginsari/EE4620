@@ -15,7 +15,7 @@ Dp = Den_GroundSlab(ks,er,h,Dkrhop,f,TE_TM_flag) ;
 Dm = Den_GroundSlab(ks,er,h,Dkrhom,f,TE_TM_flag) ;
 Dprime = (Dp-Dm) ./ deltk ;
 
-[Vr,Ir] = Residue_GroundSlab_Slab(k0,ksw,er,h,z,TE_TM_flag,Dprime);
+[Vr(z < h),Ir(z < h)] = Residue_GroundSlab_Slab(k0,ksw,er,h,z,TE_TM_flag,Dprime);
 [Vr(z > h),Ir(z > h)] = Residue_GroundSlab_Air(k0,er,h,ksw,z(z > h),TE_TM_flag,Dprime);
  
 end
