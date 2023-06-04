@@ -7,8 +7,8 @@ There are total of six assignments, first four on surface waves and leaky waves,
 
 -> Assignment 2: Far-field from stratified media
 
--> Assignment 3: Surface waves
-    Surface waves in ground slab.
+-> Assignment 3: Surface waves 
+
 -> Assignment 4: Leaky waves
 
 -> Assignment 5: Artificial dielectrics
