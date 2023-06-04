@@ -26,23 +26,26 @@ Dp = Den_GroundSlab(k0,er,h,Dkrhop,f,TE_TM_flag) ;
 Dm = Den_GroundSlab(k0,er,h,Dkrhom,f,TE_TM_flag) ;
 Dprime = (Dp-Dm) ./ deltk ;
 
-
-
 if 1 == strcmpi('TM',TE_TM_flag)
     Zs = ZsTM ;
     Zu = ZuTM ; 
     Zd = ZdTM ; 
 
 elseif 1 == strcmpi('TE',TE_TM_flag)
-    
+    Zs = ZsTE ;
+    Zu = ZuTE ; 
+    Zd = ZdTE ; 
+else
+    error('The input must be one of the following:\ n 1. TE \n 2. TM \n Your input is %s',TE_TM_flag)
+end 
 
 Cons = zeta0 .* Zu.* Zd ./(k0.* Dprime) ;
 Iz_slab = Cons .* h./(2.*er.*Zs .*sin(kzs.*h) ) .*h./2 .*(1+sinc(2.*kzs.*h./pi) ) ;
 
+Iz_air = Cons ./ (Zu) .* 1./ (2.* sqrt(ksw.^2 - k0.^2) ) ; 
 
-
-Iz_slab = 
-
+Iz  = Iz_slab + Iz_air ;
+Idelt_phi = pi ;
 
 
 end

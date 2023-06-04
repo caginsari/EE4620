@@ -42,8 +42,14 @@ end
 Cons = zeta0 .* Zu.* Zd ./(k0.* Dprime) ;
 Iz_slab = Cons .* h./(2.*er.*Zs .*sin(kzs.*h) ) .*h./2 .*(1+sinc(2.*kzs.*h./pi) ) ;
 
+Iz_air = Cons ./ (Zu) .* 1./ (2.* sqrt(ksw.^2 - k0.^2) ) ; 
 
+Iz  = Iz_slab + Iz_air ;
+Idelt_phi = pi ;
 
+Psw_delt = 1./2 .* ksw.^2 ./(2.*pi) .* Iz .* Idelt_phi ;
 
+[Iphi] = PhiInt_Uniform(er,k0,ksw,l,w) ;
+Psw = Psw_delt.* Iphi ./ Idelt_phi ;
 
 end
