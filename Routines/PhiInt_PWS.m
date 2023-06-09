@@ -11,7 +11,8 @@ ky = ksw.* sin(phi) ;
 k1 = k0 .* sqrt(er) ;
 
 keq = (k0 + k1) ./2 ;
-Jx = 2.*keq .* (cos(kx .* L./2)-cos(keq.*L./2) )./((keq.^2 - kx.^2).* sin(keq.*L./2)) .* sinc(ky .* W ./ 2) ; 
+Jx = FTCurrent(keq,kx,ky,L,W) ;
+% % Jx = 2.*keq .* (cos(kx .* L./2)-cos(keq.*L./2) )./((keq.^2 - kx.^2).* sin(keq.*L./2)) .* sinc(ky .* W ./ 2) ; 
 
 I_phi = sum(abs(Jx).^2 .* cos(phi).^2 ) .*dphi ;
 
