@@ -5,7 +5,7 @@ kx = k0 .*sin(th).*cos(phi) ;
 ky = k0.* sin(th) .*sin(phi) ;
 % k1 = k0 .* sqrt(er) ;
 
-JxUniform = L.*sinc(kx.*L ./ 2) .* sinc(ky .* W ./ 2) ;
+JxUniform = L.*sinc(kx.*L ./(pi.* 2) ) .* sinc(ky .* W ./ (pi.* 2) ) ;
 
 
 end

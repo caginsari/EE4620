@@ -10,7 +10,7 @@ kx = ksw .*cos(phi) ;
 ky = ksw.* sin(phi) ;
 % k1 = k0 .* sqrt(er) ;
 
-Jx = L.*sinc(kx.*L ./ 2) .* sinc(ky .* W ./ 2) ;
+Jx = L.*sinc(kx.*L ./(2*pi) ) .* sinc(ky .* W ./ (2*pi)) ;
 
 % keq = (k0 + k1) ./2 ;
 % Jx = FTCurrent( keq ,kx, ky, l, w ) ;
