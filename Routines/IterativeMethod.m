@@ -5,7 +5,16 @@ function [krhogn,krho] = IterativeMethod(h,er,f,type,TE_TM_flag,krho)
 k0 = @(freq) 2.*pi.* freq./3e8 ;
 
 [D] = Den_GroundSlab(k0(f),er,h,krho,f,TE_TM_flag) ;
-[~, peak] = findpeaks( abs(1 ./ D) );
+[y, peak] = findpeaks( abs(1 ./ D) );
+
+if length(peak)>1
+
+    smallPeakIndexes = y < 0.5*max(y);
+    y(smallPeakIndexes) = [] ; %Reject Y value of peaks below this threshold
+    peak(smallPeakIndexes) = [] ; %Reject X value of peaks below this threshold
+
+end
+
 krho = krho(peak);
 %% No Peaks
 if isempty(krho)
