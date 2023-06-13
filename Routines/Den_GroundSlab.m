@@ -1,4 +1,6 @@
 function [D] = Den_GroundSlab(k0,er,h,krho,freq,TE_TM_flag)
+%% EE4620 Assignment 3: [D] = Den_GroundSlab(k0,er,h,krho,freq,TE_TM_flag)
+% Dispersion equation of the Grounded Slab
 zeta0 = 120*pi ;
 lam0 = 3e8/freq ;
 lams = lam0/sqrt(er) ;
