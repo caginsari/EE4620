@@ -61,6 +61,7 @@ hold off
 
 
 %% Change in  k_rho with er.
+% Use klw instead of k0 in propagation vector.
 clear
 
 h = 15e-3 ;
