@@ -3,7 +3,7 @@ close all
 %% EE4620 Assignment 4
 % Leaky wave antenna characterisation
 
-%% Question 1: Leaky Wave propagation constants
+%% Question 1: SuperStrate Leaky Wave propagation constants 
 % Constants
 h = 15e-3 ;
 hs = 2.1e-3 ;
@@ -42,6 +42,7 @@ plot(freqn./1e9,imag(krhoTM)./k0,'b--','DisplayName','Imag,Approx,TM') ;
 legend('Location','best','Interpreter','latex')
 ylabel('$k_{\rho}/k_0$','Interpreter','latex')
 xlabel('Frequency[GHz]','Interpreter','latex')
+title('Superstrate','Interpreter','latex');
 grid on;grid minor;
 ylim([-0.53 0.44])
 hold off
@@ -55,13 +56,13 @@ plot(freqn./1e9,imag(krhoTE)./k0,'b--','DisplayName','Imag,Approx,TE') ;
 legend('Location','best','Interpreter','latex')
 ylabel('$k_{\rho}/k_0$','Interpreter','latex')
 xlabel('Frequency[GHz]','Interpreter','latex')
+title('Superstrate','Interpreter','latex');
 grid on;grid minor;
 ylim([-0.53 0.44])
 hold off
 
 
 %% Change in  k_rho with er.
-% Use klw instead of k0 in propagation vector.
 clear
 
 h = 15e-3 ;
@@ -100,6 +101,7 @@ plot(er,imag(krhoTM)./k0,'b--','DisplayName','Imag,Approx,TM') ;
 legend('Location','best','Interpreter','latex')
 ylabel('$k_{\rho}/k_0$','Interpreter','latex')
 xlabel('$\varepsilon_r$','Interpreter','latex')
+title('Superstrate','Interpreter','latex');
 grid on;grid minor;
 ylim([-0.5 0.5])
 hold off
@@ -113,64 +115,63 @@ plot(er,imag(krhoTE)./k0,'b--','DisplayName','Imag,Approx,TE') ;
 legend('Location','best','Interpreter','latex')
 ylabel('$k_{\rho}/k_0$','Interpreter','latex')
 xlabel('$\varepsilon_r$','Interpreter','latex')
+title('Superstrate','Interpreter','latex');
 grid on;grid minor;
 ylim([-0.5 0.5])
 hold off
 
 %% Question 1 Bandwidth
-
+% the Directivity plot is wrong chenck with TA.
 % Constant
 clc
 clear all
-close all
 
 % FF parameters
-freq = 28e9 ;
+freq = linspace(8e9,11e9,103); 
 R_FF = 1;
 phi  = (eps:2:360) * pi / 180;
-h = 5.4e-3 ;
-lambda = 3e8 / freq;
-k0 = 2 * pi / lambda;
+h = 15e-3 ;
+lambda = 3e8 ./ freq;
+k0 = 2 .* pi ./ lambda;
 
 theta = linspace(eps, 89.9, 303) * pi / 180;
 dth = theta(2) - theta(1);
 dph = phi(2) - phi(1);
 [TH, PH] = meshgrid(theta, phi);
 zeta0 = 120*pi ;
-er = linspace(1,25,100) ;
+er = 1:2:25 ;
 W = lambda ./ 20 ; 
 L = lambda./2 ;
 
-[KX,KY,KZ] =PropVectors(k0,TH,PH) ;
-KRHO = sqrt(KX.^2 + KY.^2);
-Z    = R_FF * cos(TH);
 
-for ff = 1:length(er) 
+for jj = 1:length(er)
+    for ff = 1:length(freq)      
+        [KX,KY,KZ] =PropVectors(k0(ff),TH,PH) ;
+        KRHO = sqrt(KX.^2 + KY.^2);
+        Z    = R_FF * cos(TH);
+        hs = lambda(ff)./(4.*sqrt(er(jj))) ;
+         
+        [vtm, vte, itm, ~, ks,kz0] = trxline_Superstrate(k0(ff), zeta0, er(jj), h, hs, KRHO, 'Layer3' ,Z, freq(ff)) ;
+        % calculate Green's function
+        [em_sgf] = SpectralGFem(k0(ff),ks,er(jj),KX,KY,vtm,vte,itm,'Layer2',zeta0,KRHO) ;
+        Gxx = em_sgf(:,:,1,1) ;
+        Gyx = em_sgf(:,:,2,1) ;
+        Gzx = em_sgf(:,:,3,1) ;
+        % calculate FT of current distribution
+        Mx = FTCurrent( k0(ff), KX, KY, L(ff), W(ff) ) ;
+        % calculate far field
+        [Eth, Eph] = farfield( TH, PH, KZ, Gxx, Gyx, Gzx, Mx, Z,R_FF,0,k0(ff)) ;
+        Etot(:,:,ff) = sqrt( abs(Eth).^2 +abs(Eph).^2 ) ;
+        Etot(isnan(Etot(:,:,ff) ) ) = 0 ;
+        [Dir, prad(ff)] = Direc(Etot(:,:,ff), TH, dth, dph, R_FF);
+        D(ff,jj) = Dir(1,1) ;
 
-    
-    hs = lambda./(4 .*sqrt(er(ff) ) ) ;
-    k1 = k0.*sqrt(er(ff)) ;
-    keq = (k0+k0)./2 ;
-
-    [vtm, vte, itm, ~, ks,kz0] = trxline_Superstrate(k0, zeta0, er(ff), h, hs, KRHO, 'Layer3' ,Z, freq) ;
-    % calculate Green's function
-    [em_sgf] = SpectralGFem(k0,ks,er(ff),KX,KY,vtm,vte,itm,'Layer2',zeta0,KRHO) ;
-    Gxx = em_sgf(:,:,1,1) ;
-    Gyx = em_sgf(:,:,2,1) ;
-    Gzx = em_sgf(:,:,3,1) ;
-    % calculate FT of current distribution
-    Mx = FTCurrent( keq, KX, KY, L, W ) ;
-    % calculate far field
-    [Eth, Eph] = farfield( TH, PH, KZ, Gxx, Gyx, Gzx, Mx, Z,R_FF,h,k0) ;
-    Etot(:,:,ff) = sqrt( abs(Eth).^2 +abs(Eph).^2 ) ;
-    Etot(isnan(Etot(:,:,ff) ) ) = 0 ;
-    [Dir, prad(ff)] = Direc(Etot(:,:,ff), TH, dth, dph, R_FF);
-    D(ff) = Dir(1,1) ;
-
+    end
 end
 figure 
-plot(er, 10*log10(abs(D))) ;
-xlabel('$\varepsilon_r$','Interpreter','latex');
+plot(freq./1e9, 10*log10(abs(D))) ;
+xlabel('$Freq[GHz]$','Interpreter','latex');
 ylabel('Directivity','Interpreter','latex');
-title('Directivity with incresing relative permittivity')
+title('Directivity With Incresing Frequency')
+title('Superstrate','Interpreter','latex');
 grid on; grid minor ;

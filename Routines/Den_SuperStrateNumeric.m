@@ -10,6 +10,7 @@ zetas = zeta0 ./ sqrt(er) ;
 
 [ZsTM,ZsTE] = TxImpedance(zetas, kzs, ks) ;
 [Z0TM,Z0TE] = TxImpedance(zeta0, kz0, k0) ;
+
 Z1in_te =  TxLineInputImpedance(ZsTE,Z0TE,kzs,hs) ;
 Z1in_tm =  TxLineInputImpedance(ZsTM,Z0TM,kzs,hs) ;
 
