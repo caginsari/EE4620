@@ -59,7 +59,7 @@ grid on;grid minor;
 ylim([-0.5 0.5])
 hold off
 
-%% Question 2 Change in krho with frequency at er=  
+%% Question 2 Change in krho with frequency at er=  12
 % Constants
 clear
 h = 10e-3 ;
@@ -117,3 +117,91 @@ grid on;grid minor;
 ylim([-0.2 0.15])
 title('Semi Infinite Superstrate','Interpreter','latex');
 hold off
+
+%% Bandwidth and Directivity
+clc
+clear all
+
+% FF parameters
+freq = linspace(10e9,20e9,103); 
+R_FF = 1;
+phi  = (eps:2:360) * pi / 180;
+h = 10e-3 ;
+lambda = 3e8 ./ freq;
+k0 = 2 .* pi ./ lambda;
+
+theta = linspace(eps, 89.9, 303) * pi / 180;
+dth = theta(2) - theta(1);
+dph = phi(2) - phi(1);
+[TH, PH] = meshgrid(theta, phi);
+zeta0 = 120*pi ;
+er = 1:2:25 ;
+W = lambda ./ 20 ; 
+L = lambda./2 ;
+
+
+for jj = 1:length(er)
+    for ff = 1:length(freq)   
+        ks = k0(ff).*sqrt(er(jj)) ;
+        [KX,KY,KZ] =PropVectors(ks,TH,PH) ;
+        KRHO = sqrt(KX.^2 + KY.^2);
+        Z    = R_FF * cos(TH);
+        hs = lambda(ff)./(4.*sqrt(er(jj))) ;
+         
+        [vte,vtm,~,itm,~] = trxline_semi_inf_Superstrate(k0(ff), er(jj), h, KRHO ,Z, 'Layer2') ;
+        % equivalent dielectric constant
+        keq = (ks+k0(ff))./2 ;
+
+
+        % calculate Green's function
+        [em_sgf] = SpectralGFem(k0(ff),ks,er(jj),KX,KY,vtm,vte,itm,'Layer1',zeta0,KRHO) ;
+        Gxx = em_sgf(:,:,1,1) ;
+        Gyx = em_sgf(:,:,2,1) ;
+        Gzx = em_sgf(:,:,3,1) ;
+        % calculate FT of current distribution
+        Mx = FTCurrent( keq, KX, KY, L(ff), W(ff) ) ;
+        % calculate far field
+        [Eth, Eph] = farfield( TH, PH, KZ, Gxx, Gyx, Gzx, Mx, Z,R_FF,0,ks) ;
+        Etot(:,:,ff) = sqrt( abs(Eth).^2 +abs(Eph).^2 ) ;
+        Etot(isnan(Etot(:,:,ff) ) ) = 0 ;
+        [Dir, prad(ff)] = Direc(Etot(:,:,ff), TH, dth, dph, R_FF);
+        D(ff,jj) = Dir(1,1) ;
+
+    end
+end
+figure 
+plot(freq./1e9, 10*log10(abs(D))) ;
+xlabel('$Freq[GHz]$','Interpreter','latex');
+ylabel('Directivity','Interpreter','latex');
+title('Directivity With Incresing Frequency')
+title('Semi-Infinite Superstrate','Interpreter','latex');
+grid on; grid minor ;
+DdB = 10.*log10(D);
+%%
+% Calculate Bandwidth
+fH=zeros(size(er)) ;
+fL = zeros(size(er)) ; 
+for ii = 1:length(er)
+    [r,c]=findpeaks(abs(DdB(:,ii))) ;
+    rf = 0;
+    if length(r)==1
+        tolerance = 0.00005;
+        while length(rf)<=3           
+            [rf,cf] =find(abs(r-3-DdB(:,ii))<tolerance) ;
+            tolerance=tolerance+0.001;
+            if tolerance>0.8
+                rf = [1 1 1 1] ;
+                warning('higher than tolerance')
+            end
+        end
+        fH(ii) = freq(max(rf)) ;
+        fL(ii) = freq(min(rf)) ;
+    end
+end
+
+BW = 200 .* (fH-fL)./(fH+fL) ;
+BW(isnan(BW))= 0;
+figure;
+plot(er,BW);
+xlabel('$\varepsilon_r$','Interpreter','latex')
+ylabel('BW[%]','Interpreter','latex')

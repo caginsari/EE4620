@@ -1,10 +1,8 @@
-function [vte,vtm,ite,itm,ks] = trxline_semi_inf_Superstrate(k0,zeta0,er,h,krho,z,freq,Layer)
+function [vte,vtm,ite,itm,ks] = trxline_semi_inf_Superstrate(k0,er,h,krho,z,Layer)
 % EE4620 Assignment 1:  semi infinite trxline voltage and current
 % parameters
-
-lam0 = 3e8/freq ;
-lams = lam0/sqrt(er) ;
-ks = 2.*pi./lams ;
+zeta0 = 120*pi ;
+ks = k0.*sqrt(er) ;
 
 kz0 = -1i .*sqrt(-(k0.^2-krho.^2) ) ; 
 kzs = -1i .*sqrt(-(ks.^2-krho.^2) ) ; 
@@ -24,8 +22,8 @@ if L1 == 1
 elseif L2 == 1
     [vte,vtm,ite,itm] = Layer2SemiInfSuperstrate(gamma1te,gamma1tm,kz0,h,z,Z1te,Z1tm,kzs) ; % Layer 2 is semi infinite dielectric 
 else
-    error(['\nInput must be one of three superstrate layers: \n Layer1 : air \n Layer2 : Semi infinite dielectric \n ' ...
-        'Layer3 : air \n your input: %s.'],Layer) ;
+    error(['\nInput must be one of two layers: \n Layer1 : air \n Layer2 : Semi infinite dielectric ' ...
+        ' \n your input: %s.'],Layer) ;
 end
 
 end

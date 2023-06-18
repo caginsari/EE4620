@@ -151,7 +151,7 @@ for jj = 1:length(er)
         Z    = R_FF * cos(TH);
         hs = lambda(ff)./(4.*sqrt(er(jj))) ;
          
-        [vtm, vte, itm, ~, ks,kz0] = trxline_Superstrate(k0(ff), zeta0, er(jj), h, hs, KRHO, 'Layer3' ,Z, freq(ff)) ;
+        [vte, vtm, ~, itm, ks,kz0] = trxline_Superstrate(k0(ff), zeta0, er(jj), h, hs, KRHO, 'Layer3' ,Z, freq(ff)) ;
         % calculate Green's function
         [em_sgf] = SpectralGFem(k0(ff),ks,er(jj),KX,KY,vtm,vte,itm,'Layer2',zeta0,KRHO) ;
         Gxx = em_sgf(:,:,1,1) ;
@@ -175,3 +175,32 @@ ylabel('Directivity','Interpreter','latex');
 title('Directivity With Incresing Frequency')
 title('Superstrate','Interpreter','latex');
 grid on; grid minor ;
+DdB = 10.*log10(D);
+%%
+% Calculate Bandwidth
+fH=zeros(size(er)) ;
+fL = zeros(size(er)) ; 
+for ii = 1:length(er)
+    [r,c]=findpeaks(abs(DdB(:,ii))) ;
+    rf = 0;
+    if length(r)==1
+        tolerance = 0.00005;
+        while length(rf)<=3           
+            [rf,cf] =find(abs(r-3-DdB(:,ii))<tolerance) ;
+            tolerance=tolerance+0.001;
+            if tolerance>0.8
+                rf = [1 1 1 1] ;
+                warning('higher than tolerance')
+            end
+        end
+        fH(ii) = freq(max(rf)) ;
+        fL(ii) = freq(min(rf)) ;
+    end
+end
+
+BW = 200 .* (fH-fL)./(fH+fL) ;
+BW(isnan(BW))= 0;
+figure;
+plot(er,BW);
+xlabel('$\varepsilon_r$','Interpreter','latex')
+ylabel('BW[%]','Interpreter','latex')
