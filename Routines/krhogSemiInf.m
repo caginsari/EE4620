@@ -12,6 +12,8 @@ switch TE_TM_flag
     case 'TM'
         % kz0 TM 
         kz0 = k0./(4.*hbar) .* (1+sqrt(1+8.*1i .* hbar./(pi.*sqrt(er) ) ) ) ;
+    case 'TM0'
+        kz0 = sqrt( 1i .* k0 ./(sqrt(er).*h) );
 end
 
 klw = sqrt(k0.^2-kz0.^2) ;

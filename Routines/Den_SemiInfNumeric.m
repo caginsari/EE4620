@@ -17,7 +17,10 @@ switch TE_TM_flag
     case 'TE'
     D = Z1TE + 1i .* Z0TE.* tan(kz0.*h);
 
-    case 'TM'
+    case 'TM' 
+    D = Z1TM + 1i .* Z0TM.* tan(kz0.*h);
+
+    case 'TM0' 
     D = Z1TM + 1i .* Z0TM.* tan(kz0.*h);
 end
 

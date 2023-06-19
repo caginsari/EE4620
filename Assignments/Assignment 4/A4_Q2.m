@@ -152,7 +152,6 @@ for jj = 1:length(er)
         % equivalent dielectric constant
         keq = (ks+k0(ff))./2 ;
 
-
         % calculate Green's function
         [em_sgf] = SpectralGFem(k0(ff),ks,er(jj),KX,KY,vtm,vte,itm,'Layer1',zeta0,KRHO) ;
         Gxx = em_sgf(:,:,1,1) ;
