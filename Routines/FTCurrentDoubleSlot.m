@@ -9,6 +9,12 @@ switch slotType
 end
 
 % FTMeq = -4.*keq.*cos(ky.*L./2)./(ky.^2 - keq.^2) .* sinc(kx.*W./(2.*pi) ) .* AF;
-FTMeq = 2.*keq.*(cos(ky.*L./2) - cos(keq.*L./2) )./((keq.^2-ky.^2).*sin(keq.*L./2)).* sinc(kx.*W./(2.*pi) ) .* AF;
+FTMeq = 2.*keq.*(cos(ky.*L./2) - cos(keq.*L./2) )./( ( keq.^2 - ky.^2).*sin(keq.*L./2) )...
+.* sinc(kx.*W./(2.*pi) )  .* AF;
 
+%  T = sinc(kx * W / (2 * pi) );
+%             F = 2 * keq * ( cos(ky *L / 2) - ...
+%                 cos(keq * L / 2) ) ./ ( (keq^2 - ...
+%                 ky.^2) * sin(keq * L / 2) ).*AF;
+% FTMeq = F.*T ;
 end
