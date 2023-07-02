@@ -48,7 +48,7 @@ clc
 clear all
 
 % FF parameters
-freq = linspace(10e9,20e9,203);
+freq = 15e9 ;% freq = linspace(10e9,20e9,203);
 R_FF = 1;
 phi  = (eps:1:360) * pi / 180;
 h = 10e-3 ;
@@ -91,7 +91,7 @@ for jj = 1:length(er)
         [Eth, Eph] = farfield( TH, PH, KZ, Gxy, Gyy, Gzy, Mx, Z,R_FF,0,ks) ;
         Etotsingle(:,:,ff) = sqrt( abs(Eth).^2 +abs(Eph).^2 ) ;
         Etotsingle(isnan(Etotsingle(:,:,ff) ) ) = 0 ;
-        [Dir, prad(ff)] = Direc(Etotsingle(:,:,ff), TH, dth, dph, R_FF);
+        [DirSingle(:,:,ff), prad(ff)] = Direc(Etotsingle(:,:,ff), TH, dth, dph, R_FF);
         Ddouble(ff,jj) = Dir(1,1) ;
 
         % calculate FT of current distribution
@@ -100,7 +100,7 @@ for jj = 1:length(er)
         [Eth, Eph] = farfield( TH, PH, KZ, Gxy, Gyy, Gzy, Mx, Z,R_FF,0,ks) ;
         Etotdouble(:,:,ff) = sqrt( abs(Eth).^2 +abs(Eph).^2 ) ;
         Etotdouble(isnan(Etotdouble(:,:,ff) ) ) = 0 ;
-        [Dir, prad(ff)] = Direc(Etotdouble(:,:,ff), TH, dth, dph, R_FF);
+        [DirDouble(:,:,ff), prad(ff)] = Direc(Etotdouble(:,:,ff), TH, dth, dph, R_FF);
         Dsingle(ff,jj) = Dir(1,1) ;
 
     end
@@ -111,7 +111,7 @@ plot(freq./1e9, 10*log10(abs(Dsingle))) ;
 xlabel('$Freq[GHz]$','Interpreter','latex');
 ylabel('Directivity','Interpreter','latex');
 title('Directivity With Incresing Frequency')
-title('Semi-Infinite Superstrate','Interpreter','latex');
+title('Semi-Infinite Superstrate(Single Slot)','Interpreter','latex');
 grid on; grid minor ;
 
 figure 
@@ -119,39 +119,65 @@ plot(freq./1e9, 10*log10(abs(Ddouble))) ;
 xlabel('$Freq[GHz]$','Interpreter','latex');
 ylabel('Directivity','Interpreter','latex');
 title('Directivity With Incresing Frequency')
-title('Semi-Infinite Superstrate','Interpreter','latex');
+title('Semi-Infinite Superstrate(Double Slot)','Interpreter','latex');
 grid on; grid minor ;
 
 figure
 hold on
-plot(rad2deg(theta),20.*log10(abs(Etotsingle(1,:,102) ) ) -20.*log10(max(max(abs(Etotsingle(:,:,102) )))),'DisplayName','phi = 0')
-plot(rad2deg(theta),20.*log10(abs(Etotsingle(46,:,102) ) ) -20.*log10(max(max(abs(Etotsingle(:,:,102) )))),'DisplayName','phi = 45')
-plot(rad2deg(theta),20.*log10(abs(Etotsingle(91,:,102) ) ) -20.*log10(max(max(abs(Etotsingle(:,:,102) )))),'DisplayName','phi = 90')
+plot(rad2deg(theta),20.*log10(abs(Etotsingle(1,:,102) ) ) -20.*log10(max(max(abs(Etotsingle(:,:,102) )))),'DisplayName','$\phi = 0^\circ$')
+plot(rad2deg(theta),20.*log10(abs(Etotsingle(46,:,102) ) ) -20.*log10(max(max(abs(Etotsingle(:,:,102) )))),'DisplayName','$\phi = 45^\circ$')
+plot(rad2deg(theta),20.*log10(abs(Etotsingle(91,:,102) ) ) -20.*log10(max(max(abs(Etotsingle(:,:,102) )))),'DisplayName','$\phi = 90^\circ$')
 hold off
+title('Single Slot','Interpreter','latex')
+xlabel('$\theta[degree]$','Interpreter','latex')
+ylabel('$\left|E_{FF}\right|$','Interpreter','latex')
+legend('Location','best','Interpreter','latex')
+grid on;grid minor;
 xlim([0 35])
 ylim([-40 0])
-title('Single')
 legend
 
 figure
 hold on
-plot(rad2deg(theta),20.*log10(abs(Etotdouble(1,:,102) ) ) -20.*log10(max(max(abs(Etotdouble(:,:,102) )))),'DisplayName','phi = 0')
-plot(rad2deg(theta),20.*log10(abs(Etotdouble(46,:,102) ) ) -20.*log10(max(max(abs(Etotdouble(:,:,102) )))),'DisplayName','phi = 45')
-plot(rad2deg(theta),20.*log10(abs(Etotdouble(91,:,102) ) ) -20.*log10(max(max(abs(Etotdouble(:,:,102) )))),'DisplayName','phi = 90')
+plot(rad2deg(theta),20.*log10(abs(Etotdouble(1,:,102) ) ) -20.*log10(max(max(abs(Etotdouble(:,:,102) )))),'DisplayName','$\phi = 0^\circ$')
+plot(rad2deg(theta),20.*log10(abs(Etotdouble(46,:,102) ) ) -20.*log10(max(max(abs(Etotdouble(:,:,102) )))),'DisplayName','$\phi = 45^\circ$')
+plot(rad2deg(theta),20.*log10(abs(Etotdouble(91,:,102) ) ) -20.*log10(max(max(abs(Etotdouble(:,:,102) )))),'DisplayName','$\phi = 90^\circ$')
 hold off
+title('Double Slot','Interpreter','latex')
+xlabel('$\theta[degree]$','Interpreter','latex')
+ylabel('$\left|E_{FF}\right|$','Interpreter','latex')
+legend('Location','best','Interpreter','latex')
+grid on;grid minor;
 xlim([0 35])
 ylim([-40 0])
-title('Double')
 legend
 
 figure
 hold on
-plot(rad2deg(theta),20.*log10(abs(Etotsingle(1,:,102) ) ) -20.*log10(max(max(abs(Etotsingle(:,:,102) )))),'DisplayName','phi = 0')
-plot(rad2deg(theta),20.*log10(abs(Etotsingle(46,:,102) ) ) -20.*log10(max(max(abs(Etotsingle(:,:,102) )))),'DisplayName','phi = 45')
-plot(rad2deg(theta),20.*log10(abs(Etotsingle(91,:,102) ) ) -20.*log10(max(max(abs(Etotsingle(:,:,102) )))),'DisplayName','phi = 90')
+plot(rad2deg(theta),10.*log10(abs(Etotsingle(1,:,102) ) ) -10.*log10(max(max(abs(Etotsingle(:,:,102) )))),'DisplayName','$\phi = 0^\circ$')
+plot(rad2deg(theta),10.*log10(abs(Etotsingle(46,:,102) ) ) -10.*log10(max(max(abs(Etotsingle(:,:,102) )))),'DisplayName','$\phi = 45^\circ$')
+plot(rad2deg(theta),10.*log10(abs(Etotsingle(91,:,102) ) ) -10.*log10(max(max(abs(Etotsingle(:,:,102) )))),'DisplayName','$\phi = 90^\circ$')
 hold off
+title('Single Slot','Interpreter','latex')
+xlabel('$\theta[degree]$','Interpreter','latex')
+ylabel('$Directivity[dB]$','Interpreter','latex')
+legend('Location','best','Interpreter','latex')
+grid on;grid minor;
 xlim([0 35])
 ylim([-40 0])
-title('Single')
 legend
 
+figure
+hold on
+plot(rad2deg(theta),20.*log10(abs(DirDouble(1,:,102) ) ) -20.*log10(max(max(abs(DirDouble(:,:,102) )))),'DisplayName','$\phi = 0^\circ$')
+plot(rad2deg(theta),20.*log10(abs(DirDouble(46,:,102) ) ) -20.*log10(max(max(abs(DirDouble(:,:,102) )))),'DisplayName','$\phi = 45^\circ$')
+plot(rad2deg(theta),20.*log10(abs(DirDouble(91,:,102) ) ) -20.*log10(max(max(abs(DirDouble(:,:,102) )))),'DisplayName','$\phi = 90^\circ$')
+hold off
+title('Double Slot','Interpreter','latex')
+xlabel('$\theta[degree]$','Interpreter','latex')
+ylabel('$\left|E_{FF}\right|$','Interpreter','latex')
+legend('Location','best','Interpreter','latex')
+grid on;grid minor;
+xlim([0 35])
+ylim([-40 0])
+legend

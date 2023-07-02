@@ -2,14 +2,17 @@ clear
 close all
 %% EE4620 Assignment 4
 % Leaky wave antenna characterisation
-
+set(0,'DefaultLineLineWidth',2)
+set(0,'defaultAxesFontSize',18)
+set(0,'defaultAxesLinewidth',2)
+set(0,'defaultfigureposition',[100 100 600 600])
 %% Question 1: SuperStrate Leaky Wave propagation constants 
 % Constants
-h = 15e-3 ;
-hs = 2.1e-3 ;
+hs = 0.77e-3 ;
+h = 5.4e-3 ;
 er = 12 ;
 freq = 11.*1e9 ;
-freqn = linspace(9e9,11e9,1001);
+freqn = linspace(26e9,30e9,1001);
 k0 = 2*pi .*freq./3e8 ;
 lambda = 3e8./freq ;
 w = lambda./20 ;
@@ -32,19 +35,21 @@ end
 k0 = 2*pi .*freqn./3e8 ;
 krhoTM = krhogSuperStrate(k0, er, h, 'TM') ;
 krhoTE = krhogSuperStrate(k0, er, h, 'TE') ;
-
 figure;
 hold on
 plot(freqn./1e9,real(klwTMn),'k','DisplayName','Real,Numeric,TM') ;
 plot(freqn./1e9,imag(klwTMn),'k--','DisplayName','Imag,Numeric,TM') ;
 plot(freqn./1e9,real(krhoTM)./k0,'b','DisplayName','Real,Approx,TM') ;
 plot(freqn./1e9,imag(krhoTM)./k0,'b--','DisplayName','Imag,Approx,TM') ;
+% plot(freqn./1e9,abs(klwTMn)./k0,'r','DisplayName','Imag,Approx,TM')
 legend('Location','best','Interpreter','latex')
 ylabel('$k_{\rho}/k_0$','Interpreter','latex')
 xlabel('Frequency[GHz]','Interpreter','latex')
 title('Superstrate','Interpreter','latex');
 grid on;grid minor;
 ylim([-0.53 0.44])
+% ax.FontSize = 18 ;
+% ax.LineWidth = 2 ;
 hold off
 
 figure;
@@ -53,6 +58,7 @@ plot(freqn./1e9,real(klwTEn),'k','DisplayName','Real,Numeric,TE')  ;
 plot(freqn./1e9,imag(klwTEn),'k--','DisplayName','Imag,Numeric,TE')  ;
 plot(freqn./1e9,real(krhoTE)./k0,'b','DisplayName','Real,Approx,TE') ;
 plot(freqn./1e9,imag(krhoTE)./k0,'b--','DisplayName','Imag,Approx,TE') ;
+% plot(freqn./1e9,abs(klwTEn)./k0,'r','DisplayName','Imag,Approx,TM')
 legend('Location','best','Interpreter','latex')
 ylabel('$k_{\rho}/k_0$','Interpreter','latex')
 xlabel('Frequency[GHz]','Interpreter','latex')
@@ -60,7 +66,6 @@ title('Superstrate','Interpreter','latex');
 grid on;grid minor;
 ylim([-0.53 0.44])
 hold off
-
 
 %% Change in  k_rho with er.
 clear
@@ -170,14 +175,64 @@ for jj = 1:length(er)
 end
 figure 
 plot(freq./1e9, 10*log10(abs(D))) ;
-xlabel('$Freq[GHz]$','Interpreter','latex');
-ylabel('Directivity','Interpreter','latex');
+xlabel('$Frequency[GHz]$','Interpreter','latex');
+ylabel('Directivity[dB]','Interpreter','latex');
 title('Directivity With Incresing Frequency')
 title('Superstrate','Interpreter','latex');
+set(gcf, 'Position',  [200, 200, 1000, 600])
 grid on; grid minor ;
 DdB = 10.*log10(D);
 %%
 % Calculate Bandwidth
+
+clc
+clear all
+
+% FF parameters
+freq = linspace(8e9,11e9,103); 
+R_FF = 1;
+phi  = (eps:2:360) * pi / 180;
+h = 15e-3 ;
+lambda = 3e8 ./ freq;
+k0 = 2 .* pi ./ lambda;
+
+theta = linspace(eps, 89.9, 303) * pi / 180;
+dth = theta(2) - theta(1);
+dph = phi(2) - phi(1);
+[TH, PH] = meshgrid(theta, phi);
+zeta0 = 120*pi ;
+er = linspace(1,25,12) ;
+W = lambda ./ 20 ; 
+L = lambda./2 ;
+
+
+for jj = 1:length(er)
+    for ff = 1:length(freq)      
+        [KX,KY,KZ] =PropVectors(k0(ff),TH,PH) ;
+        KRHO = sqrt(KX.^2 + KY.^2);
+        Z    = R_FF * cos(TH);
+        hs = lambda(ff)./(4.*sqrt(er(jj))) ;
+         
+        [vte, vtm, ~, itm, ks,kz0] = trxline_Superstrate(k0(ff), zeta0, er(jj), h, hs, KRHO, 'Layer3' ,Z, freq(ff)) ;
+        % calculate Green's function
+        [em_sgf] = SpectralGFem(k0(ff),ks,er(jj),KX,KY,vtm,vte,itm,'Layer2',zeta0,KRHO) ;
+        Gxx = em_sgf(:,:,1,1) ;
+        Gyx = em_sgf(:,:,2,1) ;
+        Gzx = em_sgf(:,:,3,1) ;
+        % calculate FT of current distribution
+        Mx = FTCurrent( k0(ff), KX, KY, L(ff), W(ff) ) ;
+        % calculate far field
+        [Eth, Eph] = farfield( TH, PH, KZ, Gxx, Gyx, Gzx, Mx, Z,R_FF,0,k0(ff)) ;
+        Etot(:,:,ff) = sqrt( abs(Eth).^2 +abs(Eph).^2 ) ;
+        Etot(isnan(Etot(:,:,ff) ) ) = 0 ;
+        [Dir, prad(ff)] = Direc(Etot(:,:,ff), TH, dth, dph, R_FF);
+        D(ff,jj) = Dir(1,1) ;
+
+    end
+end
+
+%% Bandwidth calcultation
+DdB = 10.*log10(D);
 fH=zeros(size(er)) ;
 fL = zeros(size(er)) ; 
 for ii = 1:length(er)
@@ -200,7 +255,15 @@ end
 
 BW = 200 .* (fH-fL)./(fH+fL) ;
 BW(isnan(BW))= 0;
-figure;
-plot(er,BW);
+
+figure
+BWSuper_Strate = plot(er,BW);
 xlabel('$\varepsilon_r$','Interpreter','latex')
-ylabel('BW[%]','Interpreter','latex')
+ylabel('$BW[\%]$','Interpreter','latex')
+ylim([0 32])
+title('Bandwidth of Superstrate','Interpreter','latex')
+grid on; grid minor;
+% BWSuper_Strate.LineWidth = 2 ;
+% ax = gca ;
+ax.FontSize = 18 ;
+ax.LineWidth = 2 ;

@@ -1,4 +1,8 @@
 %% Question 2 Leaky-wave propagation constants for Semi-inf superstrate
+set(0,'DefaultLineLineWidth',2)
+set(0,'defaultAxesFontSize',18)
+set(0,'defaultAxesLinewidth',2)
+set(0,'defaultfigureposition',[100 100 600 600])
 %% Change in  k_rho with er.
 close all
 clear
@@ -135,7 +139,7 @@ dth = theta(2) - theta(1);
 dph = phi(2) - phi(1);
 [TH, PH] = meshgrid(theta, phi);
 zeta0 = 120*pi ;
-er = 1:2:25 ;
+er = linspace(1,25,13) ;
 W = lambda ./ 20 ; 
 L = lambda./2 ;
 
@@ -174,6 +178,7 @@ xlabel('$Freq[GHz]$','Interpreter','latex');
 ylabel('Directivity','Interpreter','latex');
 title('Directivity With Incresing Frequency')
 title('Semi-Infinite Superstrate','Interpreter','latex');
+set(gcf, 'Position',  [200, 200, 1000, 600])
 grid on; grid minor ;
 DdB = 10.*log10(D);
 %%
@@ -204,3 +209,6 @@ figure;
 plot(er,BW);
 xlabel('$\varepsilon_r$','Interpreter','latex')
 ylabel('BW[%]','Interpreter','latex')
+ylim([0 62])
+title('Bandwidth of Semi Infinite Superstrate','Interpreter','latex')
+grid on; grid minor;
