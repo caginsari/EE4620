@@ -12,9 +12,9 @@ L = 3e-3 ;
 W = 1e-3 ;
 freq = 10e9 ;
 clear all
-h = 2e-3;
+h = 2.2e-3;
 z = h+eps ;
-er = 15 ;
+er = 12 ;
 freq = 10.*1e9 ;
 freqn = linspace(1e9,15e9,1001);
 lambdan=3e8./freqn ;
@@ -23,6 +23,7 @@ k0 = 2*pi./lambda ;
 ky = 0 ;
 zeta0 = 120*pi ;
 no_ofpt = 1001 ;
+h_lambdas = h.*sqrt(er).*freqn./3e8 ;
 
 lst= k0.*sqrt(er) ;
 krho = linspace(eps,lst,no_ofpt) ;
@@ -41,11 +42,23 @@ for ii = length(freqn):-1:1
 end
 figure
 hold on
-TE = plot(freqn./1e9,abs(krhonte),'DisplayName','TE1') ;
-TM = plot(freqn./1e9,abs(krhontm),'DisplayName','TM0') ;
+plot(freqn./1e9,abs(krhonte),'DisplayName','TE1') ;
+plot(freqn./1e9,abs(krhontm),'DisplayName','TM0') ;
 ylim([1 2.7]) 
-title(sprintf('$\\left|k_{\\rho}^{norm}\\right|$ vs Frequency, $\\varepsilon_r=%.f$, h=%.f mm',er,h./1e-3),'Interpreter','latex') ;
+title(sprintf('$\\left|k_{\\rho}^{norm}\\right|$ vs Frequency, $\\varepsilon_r=%.f$',er),'Interpreter','latex') ;
 xlabel('Frequency[GHz]','Interpreter','latex');
+ylabel('$\left|k_{\rho} ^{norm}\right|$','Interpreter','latex') ;
+legend('Interpreter','latex','Location','best')
+grid on;
+
+figure
+hold on
+plot(h_lambdas,abs(krhonte),'DisplayName','TE1') ;
+plot(h_lambdas,abs(krhontm),'DisplayName','TM0') ;
+ylim([1 2.7]) 
+xlim([0 0.38])
+title(sprintf('$\\left|k_{\\rho}^{norm}\\right|$ vs $\\frac{h}{\\lambda_d}$, $\\varepsilon_r=%.f$',er),'Interpreter','latex') ;
+xlabel('$\frac{h}{\lambda_d}$','Interpreter','latex');
 ylabel('$\left|k_{\rho} ^{norm}\right|$','Interpreter','latex') ;
 legend('Interpreter','latex','Location','best')
 grid on;

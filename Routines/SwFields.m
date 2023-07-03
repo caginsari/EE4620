@@ -21,6 +21,6 @@ Ez = -zeta.*ksw./k .* Ir .* JxFT .* C .* cos(phi) .*exp(-1i.* ksw .*rho)./ sqrt(
 Hphi = Ir .* JxFT .* C .*cos(phi) .*exp(-1i.* ksw .*rho)./ sqrt(rho) ;
 
 % Electrical Length h
-h = JxFT./(2.*keq) .* cos(phi) ;
+h = JxFT./(2.*keq) .* cos(phi) .* 2.* keq;
 
 end

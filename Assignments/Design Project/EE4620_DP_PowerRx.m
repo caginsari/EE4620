@@ -8,15 +8,15 @@ set(0,'defaultfigureposition',[100 100 600 600])
 clear 
 l = 3e-3 ;
 w = 1e-3 ;
-h = 2.067e-3 ;
-er = 15; 
+h = 2.2e-3 ;
+er = 12; 
 f= 10e9 ;
 k0 = 2.*pi.* f./3e8 ;
 no_ofpt = 1001 ;
 phi = linspace(-pi/2,pi/2,303) ;
 lambdas = 3e8./(f.*sqrt(er)) ;
 rho = linspace(10,10000,303)*1e-2; % linspace(eps,1,200) ; 
-
+[RHO,PHI] = meshgrid(rho,phi) ;
 z = h ;
 Ra = 50 ;
 
@@ -32,30 +32,35 @@ for rr = 1:length(rho)
         [VrTM,IrTM] = Residue_GroundSlab(k0,er,h,kswTM,z,f,'TM') ;
         [Erhotm(ii,rr),~,~,h2(ii,rr)] = SwFields(k0,kswTM,er,VrTM,IrTM,rho(rr),phi(ii),l,w) ;
 
-        Voc = abs(Erhotm(ii,rr).*cos(phi(ii)) ) ;
+        Voc = abs(Erhotm(ii,rr).*h2(ii,rr) ) ;
         Prx(ii,rr) = Voc.^2 ./ (8.*Ra) ;
     end
 end
 % [~,~,ResTM,~] = residue_stratified(k0, kswTE, kswTM, z, 'GroundSlab',h,er)
 
 figure 
-plot(rad2deg(phi),10.*log10(Prx(:,1))-10.*log10(max(Prx(:,1)))) ;
+plot(rad2deg(phi),10.*log10(Prx(:,1)) ) ;
 title('Power Received With Changing Incident Angle','Interpreter','latex') ;
 xlim([-90 90]);ylim([-60 0]);
 ylabel('$P_{rx}^{norm}[dB]$','Interpreter','latex') ;
 xlabel('$\phi_i$[Degree]','Interpreter','latex') ;
-grid on;grid minor;
+grid on;
+
+figure 
+plot(rad2deg(phi),10.*log10(Prx(:,1)) - 10.*log10(max(Prx(:,1)) ) ) ;
+title('Power Received With Changing Incident Angle','Interpreter','latex') ;
+xlim([-90 90]);ylim([-60 0]);
+ylabel('$P_{rx}^{norm}[dB]$','Interpreter','latex') ;
+xlabel('$\phi_i$[Degree]','Interpreter','latex') ;
+grid on;
 
 figure 
 hold on
-plot(rho/1e-2, 10.*log10( Prx(round( length(phi)/2 ), :) )  - 10.*log10(max( Prx(round( length(phi)/2 ) ,: ) ) ) );
+plot(rho/1e-2, 10.*log10( Prx(round( length(phi)/2 ), :) )  - 10.*log10(max( Prx(round( length(phi)/2 ) ,: ) ) ),'k','DisplayName','Prx[dB]' );
+plot(rho./1e-2, 10.*log10(1./rho)-10.*log10(max(1./rho)),'r--',DisplayName='$1/\rho$[dB]')
+% plot(rho./1e-2,10.*log10(1./sqrt(rho))-10.*log10(max(1./sqrt(rho)) ) ,'r--', DisplayName='1/sqrt(rho)')
 title('Power Received With Radial Distance','Interpreter','latex')
 xlabel('$\rho[cm]$','Interpreter','latex')
 ylabel('$P_{rx}^{norm}[dB]$','Interpreter','latex')
-
-figure
-hold on
-plot(rho./1e-2, 10.*log10(1./rho)-10.*log10(max(1./rho)),DisplayName='1/rho')
-plot(rho./1e-2,10.*log10(1./sqrt(rho))-10.*log10(max(1./sqrt(rho)) ) , DisplayName='1/sqrt(rho)')
-legend
-hold off
+legend('Interpreter','latex','Location','best')
+grid on;
