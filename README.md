@@ -17,5 +17,3 @@ There are total of six assignments, and four main topics.
 ## Topic 4: Connected Arrays
 * [Assignment 6: Connected Arrays](./Assignments/Assignment_6)
 
-# Topic 1: Stratified Media and Green's Functions
-
