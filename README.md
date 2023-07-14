@@ -4,7 +4,7 @@ Quarter 4 course of THz Sensing group in TU Delft. Contains the assignments and 
 There are total of six assignments, and four main topics.
 
 ## Topic 1: Stratified Media and Green's Functions.
--> Assignment 1: Stratified Green's Function
+* [Assignment 1: Stratified Green's Function](./EE4620/Assignments/Assignment1)
 
 -> Assignment 2: Far-field from stratified media
 ## Topic 2: Surface and Leaky Waves.
