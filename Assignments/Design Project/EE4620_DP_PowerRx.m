@@ -56,8 +56,8 @@ grid on;
 
 figure 
 hold on
-plot(rho/1e-2, 10.*log10( Prx(round( length(phi)/2 ), :) )  - 10.*log10(max( Prx(round( length(phi)/2 ) ,: ) ) ),'k','DisplayName','Prx[dB]' );
-plot(rho./1e-2, 10.*log10(1./rho)-10.*log10(max(1./rho)),'r--',DisplayName='$1/\rho$[dB]')
+plot(rho/1e-2, 10.*log10( Prx(round( length(phi)/2 ), :) )  ,'k','DisplayName','Prx[dB]' );
+% plot(rho./1e-2, 10.*log10(1./rho)-10.*log10(max(1./rho)),'r--',DisplayName='$1/\rho$[dB]')
 % plot(rho./1e-2,10.*log10(1./sqrt(rho))-10.*log10(max(1./sqrt(rho)) ) ,'r--', DisplayName='1/sqrt(rho)')
 title('Power Received With Radial Distance','Interpreter','latex')
 xlabel('$\rho[cm]$','Interpreter','latex')
